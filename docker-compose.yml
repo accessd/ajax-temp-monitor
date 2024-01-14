@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    restart: always
+    env_file:
+      - .env
+    logging:
+      options:
+        max-size: 100m
+      driver: json-file
+    ports:
+      - "8080:8080"
+
+  influxdb:
+    image: influxdb:2.7-alpine
+    restart: always
+    volumes:
+      - influxdbv2:/var/lib/influxdb2:rw
+    logging:
+      options:
+        max-size: 100m
+      driver: json-file
+    ports:
+      - "8086:8086"
+
+volumes:
+  influxdbv2:
