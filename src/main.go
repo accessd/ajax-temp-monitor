@@ -16,11 +16,12 @@ import (
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 )
 
+type Input struct {
+	Data string `json:"data"`
+}
+
 func main() {
 	http.HandleFunc("/temp", func(w http.ResponseWriter, r *http.Request) {
-		type Input struct {
-			Data string `json:"data"`
-		}
 
 		var input Input
 
@@ -34,25 +35,31 @@ func main() {
 		fmt.Println("Time:", time.Now())
 		fmt.Println("Inputed data:", input.Data)
 
-		lines := strings.Split(input.Data, "\n")
-		re := regexp.MustCompile(`^(\d+)°C$`)
-		roomTemps := make(map[string]interface{})
-
-		for i := 0; i < len(lines); i++ {
-			matches := re.FindStringSubmatch(lines[i])
-			if matches != nil {
-				v, _ := strconv.Atoi(matches[1])
-				roomTemps[lines[i-1]] = v
-			}
-		}
-
+		roomTemps := parseRoomTemps(input.Data)
 		fmt.Println("room temps:", roomTemps)
 		writeToInflux(roomTemps)
+
 		w.WriteHeader(200)
 	})
 
 	fmt.Println("Server is running on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
+}
+
+func parseRoomTemps(data string) map[string]interface{} {
+	lines := strings.Split(data, "\n")
+	re := regexp.MustCompile(`^(\d+)°C$`)
+	roomTemps := make(map[string]interface{})
+
+	for i := 0; i < len(lines); i++ {
+		matches := re.FindStringSubmatch(lines[i])
+		if matches != nil {
+			v, _ := strconv.Atoi(matches[1])
+			roomTemps[lines[i-1]] = v
+		}
+	}
+
+	return roomTemps
 }
 
 func writeToInflux(params map[string]interface{}) {
