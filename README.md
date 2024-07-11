@@ -1,7 +1,7 @@
 # Ajax Temperature Monitor
 
 The part of the project for monitoring temperature in the apartment with Ajax app + Apple Shortcuts + Go + InfluxDB + Grafana.
-More on https://morskov.com/blog/2024/01/14/ajax-temperature-monitoring
+More on https://morskov.com/blog/2024/01/15/ajax-temperature-monitoring-en
 
 ## Installation
 
